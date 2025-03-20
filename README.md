@@ -64,7 +64,7 @@ This server implements all Figma API methods as MCP tools:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/mcp-figma.git
+git clone https://github.com/jayarrowz/mcp-figma.git
 cd mcp-figma
 
 # Install dependencies
@@ -93,7 +93,7 @@ Add the following to your `claude_desktop_config.json`:
   "mcpServers": {
     "figma": {
       "command": "npx",
-      "args": ["@yourusername/mcp-figma"]
+      "args": ["@jayarrowz/mcp-figma"]
     }
   }
 }
