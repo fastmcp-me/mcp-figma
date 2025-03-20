@@ -5,15 +5,14 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
     CallToolRequestSchema,
     ListToolsRequestSchema,
-    Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import { z } from 'zod';
 import apiClientInstance, { setFigmaToken } from "./src/api/ApiBase.js";
+import { zodToJsonSchema } from 'zod-to-json-schema';
 
 const responseToString = (response: any) => {
     return {
-        result: JSON.stringify(response),
-        type: "json"
+        content: [{ type: "text", text: JSON.stringify(response) }]
     };
 }
 
@@ -175,6 +174,13 @@ const GetLibraryAnalyticsVariableUsagesArgumentsSchema = FileKeySchema.extend({
     group_by: z.enum(["variable", "file"]).describe("A dimension to group returned analytics data by")
 });
 
+// Add a utility function to help with conversion
+function convertZodToJsonSchema(schema: z.ZodType<any>) {
+  const jsonSchema = zodToJsonSchema(schema);
+  return {
+    ...jsonSchema
+  };
+}
 
 // Create server instance
 const server = new Server(
@@ -196,159 +202,168 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             {
                 name: "figma_get_me",
                 description: "Get the current user",
-                inputSchema: z.object({})
+                inputSchema: {
+                    properties: {
+                        aString: {
+                            type: "string",
+                            description: "A string"
+                        }
+                    },
+                    required: [],
+                    type: "object",
+                }
             },
             {
                 name: "figma_get_file",
                 description: "Get a Figma file by key",
-                inputSchema: GetFileArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetFileArgumentsSchema),
             },
             {
                 name: "figma_get_file_nodes",
                 description: "Get specific nodes from a Figma file",
-                inputSchema: GetFileNodesArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetFileNodesArgumentsSchema),
             },
             {
                 name: "figma_get_images",
                 description: "Render images from a Figma file",
-                inputSchema: GetImagesArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetImagesArgumentsSchema),
             },
             {
                 name: "figma_get_image_fills",
                 description: "Get image fills in a Figma file",
-                inputSchema: FileKeySchema,
+                inputSchema: convertZodToJsonSchema(FileKeySchema),
             },
             {
                 name: "figma_get_file_versions",
                 description: "Get version history of a Figma file",
-                inputSchema: GetFileVersionsArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetFileVersionsArgumentsSchema),
             },
             {
                 name: "figma_get_comments",
                 description: "Get comments in a Figma file",
-                inputSchema: FigmaGetCommentsArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(FigmaGetCommentsArgumentsSchema),
             },
             {
                 name: "figma_post_comment",
                 description: "Add a comment to a Figma file",
-                inputSchema: PostCommentArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(PostCommentArgumentsSchema),
             },
             {
                 name: "figma_delete_comment",
                 description: "Delete a comment from a Figma file",
-                inputSchema: DeleteCommentArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(DeleteCommentArgumentsSchema),
             },
             {
                 name: "figma_get_comment_reactions",
                 description: "Get reactions for a comment",
-                inputSchema: GetCommentReactionsArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetCommentReactionsArgumentsSchema),
             },
             {
                 name: "figma_post_comment_reaction",
                 description: "Add a reaction to a comment",
-                inputSchema: PostCommentReactionArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(PostCommentReactionArgumentsSchema),
             },
             {
                 name: "figma_delete_comment_reaction",
                 description: "Delete a reaction from a comment",
-                inputSchema: DeleteCommentReactionArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(DeleteCommentReactionArgumentsSchema),
             },
             {
                 name: "figma_get_team_projects",
                 description: "Get projects in a team",
-                inputSchema: GetTeamProjectsArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetTeamProjectsArgumentsSchema),
             },
             {
                 name: "figma_get_project_files",
                 description: "Get files in a project",
-                inputSchema: GetProjectFilesArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetProjectFilesArgumentsSchema),
             },
             {
                 name: "figma_get_team_components",
                 description: "Get components in a team",
-                inputSchema: GetTeamComponentsArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetTeamComponentsArgumentsSchema),
             },
             {
                 name: "figma_get_file_components",
                 description: "Get components in a file",
-                inputSchema: FileKeySchema,
+                inputSchema: convertZodToJsonSchema(FileKeySchema),
             },
             {
                 name: "figma_get_component",
                 description: "Get a component by key",
-                inputSchema: GetComponentArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetComponentArgumentsSchema),
             },
             {
                 name: "figma_get_team_component_sets",
                 description: "Get component sets in a team",
-                inputSchema: GetTeamComponentSetsArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetTeamComponentSetsArgumentsSchema),
             },
             {
                 name: "figma_get_file_component_sets",
                 description: "Get component sets in a file",
-                inputSchema: FileKeySchema,
+                inputSchema: convertZodToJsonSchema(FileKeySchema),
             },
             {
                 name: "figma_get_component_set",
                 description: "Get a component set by key",
-                inputSchema: GetComponentSetArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetComponentSetArgumentsSchema),
             },
             {
                 name: "figma_get_team_styles",
                 description: "Get styles in a team",
-                inputSchema: GetTeamStylesArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetTeamStylesArgumentsSchema),
             },
             {
                 name: "figma_get_file_styles",
                 description: "Get styles in a file",
-                inputSchema: FileKeySchema,
+                inputSchema: convertZodToJsonSchema(FileKeySchema),
             },
             {
                 name: "figma_get_style",
                 description: "Get a style by key",
-                inputSchema: GetStyleArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetStyleArgumentsSchema),
             },
             // Add these webhook tools
             {
                 name: "figma_post_webhook",
                 description: "Create a webhook",
-                inputSchema: PostWebhookArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(PostWebhookArgumentsSchema),
             },
             {
                 name: "figma_get_webhook",
                 description: "Get a webhook by ID",
-                inputSchema: GetWebhookArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetWebhookArgumentsSchema),
             },
             {
                 name: "figma_update_webhook",
                 description: "Update a webhook",
-                inputSchema: UpdateWebhookArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(UpdateWebhookArgumentsSchema),
             },
             {
                 name: "figma_delete_webhook",
                 description: "Delete a webhook",
-                inputSchema: DeleteWebhookArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(DeleteWebhookArgumentsSchema),
             },
             {
                 name: "figma_get_team_webhooks",
                 description: "Get webhooks for a team",
-                inputSchema: GetTeamWebhooksArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetTeamWebhooksArgumentsSchema),
             },
             // Add library analytics tools
             {
                 name: "figma_get_library_analytics_component_usages",
                 description: "Get library analytics component usage data",
-                inputSchema: GetLibraryAnalyticsComponentUsagesArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetLibraryAnalyticsComponentUsagesArgumentsSchema),
             },
             {
                 name: "figma_get_library_analytics_style_usages",
                 description: "Get library analytics style usage data",
-                inputSchema: GetLibraryAnalyticsStyleUsagesArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetLibraryAnalyticsStyleUsagesArgumentsSchema),
             },
             {
                 name: "figma_get_library_analytics_variable_usages",
                 description: "Get library analytics variable usage data",
-                inputSchema: GetLibraryAnalyticsVariableUsagesArgumentsSchema,
+                inputSchema: convertZodToJsonSchema(GetLibraryAnalyticsVariableUsagesArgumentsSchema),
             }
         ]
     };
@@ -532,7 +547,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     .join(", ")}`
             );
         }
-        throw error;
+        
+        // Add detailed error logging
+        const err = error as any;
+        console.error("Error details:", {
+            message: err.message,
+            stack: err.stack,
+            response: err.response?.data || null,
+            status: err.response?.status || null,
+            headers: err.response?.headers || null,
+            name: err.name,
+            fullError: JSON.stringify(err, Object.getOwnPropertyNames(err), 2)
+        });
+        
+        throw new Error(`Error executing tool ${name}: ${err.message}${err.response?.data ? ` - Response: ${JSON.stringify(err.response.data)}` : ''}`);
     }
 });
 
@@ -545,7 +573,7 @@ async function main() {
 
         // Look for --token or -t flag
         for (let i = 0; i < args.length; i++) {
-            if ((args[i] === '--figma-token' || args[i] === '-t') && i + 1 < args.length) {
+            if ((args[i] === '--figma-token' || args[i] === '-ft') && i + 1 < args.length) {
                 figmaToken = args[i + 1];
                 break;
             }
@@ -561,6 +589,7 @@ async function main() {
             setFigmaToken(figmaToken);
         } else {
             console.error("Warning: No Figma API token provided. Set FIGMA_API_KEY environment variable or use --figma-token flag.");
+            throw new Error("No Figma API token provided. Set FIGMA_API_KEY environment variable or use --figma-token flag.");
         }
 
         console.error("Starting MCP Figma Server...");
@@ -572,16 +601,6 @@ async function main() {
         process.exit(1);
     }
 }
-
-// Handle process events
-process.on('uncaughtException', (error) => {
-    console.error('Uncaught exception:', error)
-})
-
-process.on('unhandledRejection', (error) => {
-    console.error('Unhandled rejection:', error)
-})
-
 
 main().catch((error) => {
     console.error("Fatal error in main():", error);
