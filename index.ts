@@ -7,7 +7,7 @@ import {
     ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { z } from 'zod';
-import apiClientInstance from "./src/api/ApiBase";
+import apiClientInstance from "./src/api/ApiBase.js";
 
 const responseToString = (response: any) => {
     return {
@@ -126,6 +126,52 @@ const GetFileArgumentsSchema = FileKeySchema.extend({
     geometry: z.string().optional().describe("Set to \"paths\" to export vector data"),
     plugin_data: z.string().optional().describe("A comma separated list of plugin IDs and/or the string \"shared\""),
     branch_data: z.boolean().optional().describe("Returns branch metadata for the requested file")
+});
+
+// Add these webhook schemas
+const PostWebhookArgumentsSchema = z.object({
+    event_type: z.string().describe("An enum representing the possible events that a webhook can subscribe to"),
+    team_id: z.string().describe("Team id to receive updates about"),
+    endpoint: z.string().describe("The HTTP endpoint that will receive a POST request when the event triggers"),
+    passcode: z.string().describe("String that will be passed back to your webhook endpoint to verify that it is being called by Figma"),
+    status: z.string().optional().describe("State of the webhook, including any error state it may be in"),
+    description: z.string().optional().describe("User provided description or name for the webhook")
+});
+
+const GetWebhookArgumentsSchema = z.object({
+    webhook_id: z.string().describe("The ID of the webhook to get")
+});
+
+const UpdateWebhookArgumentsSchema = z.object({
+    webhook_id: z.string().describe("The ID of the webhook to update"),
+    endpoint: z.string().optional().describe("The HTTP endpoint that will receive a POST request when the event triggers"),
+    passcode: z.string().optional().describe("String that will be passed back to your webhook endpoint to verify that it is being called by Figma"),
+    status: z.string().optional().describe("State of the webhook, including any error state it may be in"),
+    description: z.string().optional().describe("User provided description or name for the webhook")
+});
+
+const DeleteWebhookArgumentsSchema = z.object({
+    webhook_id: z.string().describe("The ID of the webhook to delete")
+});
+
+const GetTeamWebhooksArgumentsSchema = z.object({
+    team_id: z.string().describe("The ID of the team to get webhooks for")
+});
+
+// Library analytics schemas
+const GetLibraryAnalyticsComponentUsagesArgumentsSchema = FileKeySchema.extend({
+    cursor: z.string().optional().describe("Cursor indicating what page of data to fetch"),
+    group_by: z.enum(["component", "file"]).describe("A dimension to group returned analytics data by")
+});
+
+const GetLibraryAnalyticsStyleUsagesArgumentsSchema = FileKeySchema.extend({
+    cursor: z.string().optional().describe("Cursor indicating what page of data to fetch"),
+    group_by: z.enum(["style", "file"]).describe("A dimension to group returned analytics data by")
+});
+
+const GetLibraryAnalyticsVariableUsagesArgumentsSchema = FileKeySchema.extend({
+    cursor: z.string().optional().describe("Cursor indicating what page of data to fetch"),
+    group_by: z.enum(["variable", "file"]).describe("A dimension to group returned analytics data by")
 });
 
 // Create server instance
@@ -258,6 +304,48 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 name: "figma_get_style",
                 description: "Get a style by key",
                 inputSchema: GetStyleArgumentsSchema,
+            },
+            // Add these webhook tools
+            {
+                name: "figma_post_webhook",
+                description: "Create a webhook",
+                inputSchema: PostWebhookArgumentsSchema,
+            },
+            {
+                name: "figma_get_webhook",
+                description: "Get a webhook by ID",
+                inputSchema: GetWebhookArgumentsSchema,
+            },
+            {
+                name: "figma_update_webhook",
+                description: "Update a webhook",
+                inputSchema: UpdateWebhookArgumentsSchema,
+            },
+            {
+                name: "figma_delete_webhook",
+                description: "Delete a webhook",
+                inputSchema: DeleteWebhookArgumentsSchema,
+            },
+            {
+                name: "figma_get_team_webhooks",
+                description: "Get webhooks for a team",
+                inputSchema: GetTeamWebhooksArgumentsSchema,
+            },
+            // Add library analytics tools
+            {
+                name: "figma_get_library_analytics_component_usages",
+                description: "Get library analytics component usage data",
+                inputSchema: GetLibraryAnalyticsComponentUsagesArgumentsSchema,
+            },
+            {
+                name: "figma_get_library_analytics_style_usages",
+                description: "Get library analytics style usage data",
+                inputSchema: GetLibraryAnalyticsStyleUsagesArgumentsSchema,
+            },
+            {
+                name: "figma_get_library_analytics_variable_usages",
+                description: "Get library analytics variable usage data",
+                inputSchema: GetLibraryAnalyticsVariableUsagesArgumentsSchema,
             }
         ]
     };
@@ -386,6 +474,48 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const { key: styleKey } = GetStyleArgumentsSchema.parse(args);
                 const styleResponse = await apiClientInstance.v1.getStyle(styleKey);
                 return responseToString(styleResponse.data);
+                
+            // V2 API methods
+            case "figma_post_webhook":
+                const webhookData = PostWebhookArgumentsSchema.parse(args);
+                const postWebhookResponse = await apiClientInstance.v2.postWebhook(webhookData as any);
+                return responseToString(postWebhookResponse.data);
+                
+            case "figma_get_webhook":
+                const { webhook_id } = GetWebhookArgumentsSchema.parse(args);
+                const getWebhookResponse = await apiClientInstance.v2.getWebhook(webhook_id);
+                return responseToString(getWebhookResponse.data);
+                
+            case "figma_update_webhook": 
+                const { webhook_id: updateWebhookId, ...updateWebhookData } = UpdateWebhookArgumentsSchema.parse(args);
+                const updateWebhookResponse = await apiClientInstance.v2.putWebhook(updateWebhookId, updateWebhookData as any);
+                return responseToString(updateWebhookResponse.data);
+                
+            case "figma_delete_webhook":
+                const { webhook_id: deleteWebhookId } = DeleteWebhookArgumentsSchema.parse(args);
+                const deleteWebhookResponse = await apiClientInstance.v2.deleteWebhook(deleteWebhookId);
+                return responseToString(deleteWebhookResponse.data);
+                
+            case "figma_get_team_webhooks":
+                const { team_id } = GetTeamWebhooksArgumentsSchema.parse(args);
+                const getTeamWebhooksResponse = await apiClientInstance.v2.getTeamWebhooks(team_id);
+                return responseToString(getTeamWebhooksResponse.data);
+                
+            // Library analytics methods
+            case "figma_get_library_analytics_component_usages":
+                const { fileKey: componentsAnalyticsFileKey, ...componentsAnalyticsParams } = GetLibraryAnalyticsComponentUsagesArgumentsSchema.parse(args);
+                const getLibraryAnalyticsComponentsResponse = await apiClientInstance.v1.getLibraryAnalyticsComponentUsages(componentsAnalyticsFileKey, componentsAnalyticsParams);
+                return responseToString(getLibraryAnalyticsComponentsResponse.data);
+                
+            case "figma_get_library_analytics_style_usages":
+                const { fileKey: stylesAnalyticsFileKey, ...stylesAnalyticsParams } = GetLibraryAnalyticsStyleUsagesArgumentsSchema.parse(args);
+                const getLibraryAnalyticsStylesResponse = await apiClientInstance.v1.getLibraryAnalyticsStyleUsages(stylesAnalyticsFileKey, stylesAnalyticsParams);
+                return responseToString(getLibraryAnalyticsStylesResponse.data);
+                
+            case "figma_get_library_analytics_variable_usages":
+                const { fileKey: variablesAnalyticsFileKey, ...variablesAnalyticsParams } = GetLibraryAnalyticsVariableUsagesArgumentsSchema.parse(args);
+                const getLibraryAnalyticsVariablesResponse = await apiClientInstance.v1.getLibraryAnalyticsVariableUsages(variablesAnalyticsFileKey, variablesAnalyticsParams);
+                return responseToString(getLibraryAnalyticsVariablesResponse.data);
                 
             default:
                 throw new Error(`Unknown tool: ${name}`);
