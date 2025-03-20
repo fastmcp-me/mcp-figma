@@ -1,2 +1,165 @@
-# mcp-figma
- Figma MCP
+# Figma MCP Server
+
+MCP Server for interacting with the Figma API. This server provides a complete set of Figma API methods through the Model Context Protocol.
+
+
+## Tools
+
+This server implements all Figma API methods as MCP tools:
+
+### User Methods
+1. `figma_get_me` - Get the current user
+
+### File Methods
+2. `figma_get_file` - Get a Figma file by key
+3. `figma_get_file_nodes` - Get specific nodes from a Figma file
+4. `figma_get_images` - Render images from a Figma file
+5. `figma_get_image_fills` - Get image fills in a Figma file
+6. `figma_get_file_versions` - Get version history of a Figma file
+
+### Comment Methods
+7. `figma_get_comments` - Get comments in a Figma file
+8. `figma_post_comment` - Add a comment to a Figma file
+9. `figma_delete_comment` - Delete a comment from a Figma file
+10. `figma_get_comment_reactions` - Get reactions for a comment
+11. `figma_post_comment_reaction` - Add a reaction to a comment
+12. `figma_delete_comment_reaction` - Delete a reaction from a comment
+
+### Team and Project Methods
+13. `figma_get_team_projects` - Get projects in a team
+14. `figma_get_project_files` - Get files in a project
+
+### Component Methods
+15. `figma_get_team_components` - Get components in a team
+16. `figma_get_file_components` - Get components in a file
+17. `figma_get_component` - Get a component by key
+18. `figma_get_team_component_sets` - Get component sets in a team
+19. `figma_get_file_component_sets` - Get component sets in a file
+20. `figma_get_component_set` - Get a component set by key
+
+### Style Methods
+21. `figma_get_team_styles` - Get styles in a team
+22. `figma_get_file_styles` - Get styles in a file
+23. `figma_get_style` - Get a style by key
+
+### Webhook Methods (V2 API)
+24. `figma_post_webhook` - Create a webhook
+25. `figma_get_webhook` - Get a webhook by ID
+26. `figma_update_webhook` - Update a webhook
+27. `figma_delete_webhook` - Delete a webhook
+28. `figma_get_team_webhooks` - Get webhooks for a team
+
+### Library Analytics Methods
+29. `figma_get_library_analytics_component_usages` - Get library analytics component usage data
+30. `figma_get_library_analytics_style_usages` - Get library analytics style usage data
+31. `figma_get_library_analytics_variable_usages` - Get library analytics variable usage data
+
+## Installation
+
+### Prerequisites
+- Node.js (v16 or later)
+- npm or yarn
+
+### Installing the package
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/mcp-figma.git
+cd mcp-figma
+
+# Install dependencies
+npm install
+
+# Build the package
+npm run build
+```
+
+## Setup
+
+To use this MCP server, you need to set up your Figma API token.
+
+```
+# Create a .env file
+FIGMA_API_KEY=your_figma_api_key
+```
+
+### Usage with Claude Desktop
+
+Add the following to your `claude_desktop_config.json`:
+
+#### Using npx
+```json
+{
+  "mcpServers": {
+    "figma": {
+      "command": "npx",
+      "args": ["@yourusername/mcp-figma"]
+    }
+  }
+}
+```
+
+#### Direct Node.js
+```json
+{
+  "mcpServers": {
+    "figma": {
+      "command": "node",
+      "args": ["/path/to/mcp-figma/dist/index.js"]
+    }
+  }
+}
+```
+
+Replace `/path/to/mcp-figma` with the actual path to your repository.
+
+## Examples
+
+### Get a Figma File
+
+```javascript
+// Get a Figma file
+const result = await callTool("figma_get_file", { 
+  fileKey: "abcXYZ123"
+});
+```
+
+### Get Comments from a File
+
+```javascript
+// Get comments from a file
+const comments = await callTool("figma_get_comments", { 
+  fileKey: "abcXYZ123",
+  as_md: true 
+});
+```
+
+### Create a Webhook
+
+```javascript
+// Create a webhook
+const webhook = await callTool("figma_post_webhook", {
+  event_type: "FILE_UPDATE",
+  team_id: "12345",
+  endpoint: "https://example.com/webhook",
+  passcode: "your_passcode_here",
+  description: "File update webhook"
+});
+```
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start the server in development mode
+npm start
+
+# Build the server
+npm run build
+```
+
+## License
+
+This MCP server is licensed under the MIT License. This means you are free to use, modify, and distribute the software, subject to the terms and conditions of the MIT License. For more details, please see the LICENSE file in the project repository.
