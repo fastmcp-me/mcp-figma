@@ -1,5 +1,6 @@
 # Figma MCP Server
 
+[![smithery badge](https://smithery.ai/badge/@jayarrowz/mcp-figma)](https://smithery.ai/embed/@jayarrowz/mcp-figma)
 MCP Server for interacting with the Figma API. This server provides a complete set of Figma API methods through the Model Context Protocol. Sometimes on large figma files you might have to tell it to use depth = 1 for figma_get_file then increase when it needs more.
 
 ## Tools
@@ -54,6 +55,14 @@ This server implements all Figma API methods as MCP tools:
 31. `figma_get_library_analytics_variable_usages` - Get library analytics variable usage data
 
 ## Installation
+
+### Installing via Smithery
+
+To install mcp-figma for Claude Desktop automatically via [Smithery](https://smithery.ai/embed/@jayarrowz/mcp-figma):
+
+```bash
+npx @smithery/cli@latest install @jayarrowz/mcp-figma --client claude
+```
 
 ### Prerequisites
 - Node.js (v16 or later)
