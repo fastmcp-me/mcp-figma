@@ -5,9 +5,10 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
     CallToolRequestSchema,
     ListToolsRequestSchema,
+    Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import { z } from 'zod';
-import apiClientInstance from "./src/api/ApiBase.js";
+import apiClientInstance, { setFigmaToken } from "./src/api/ApiBase.js";
 
 const responseToString = (response: any) => {
     return {
@@ -174,6 +175,7 @@ const GetLibraryAnalyticsVariableUsagesArgumentsSchema = FileKeySchema.extend({
     group_by: z.enum(["variable", "file"]).describe("A dimension to group returned analytics data by")
 });
 
+
 // Create server instance
 const server = new Server(
     {
@@ -193,7 +195,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         tools: [
             {
                 name: "figma_get_me",
-                description: "Get the current user"
+                description: "Get the current user",
+                inputSchema: z.object({})
             },
             {
                 name: "figma_get_file",
@@ -356,41 +359,41 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
 
     try {
-        switch(name) {
+        switch (name) {
             case "figma_get_me":
                 const userResponse = await apiClientInstance.v1.getMe();
                 return responseToString(userResponse.data);
-                
+
             case "figma_get_file":
                 const { fileKey, ...fileQueryParams } = GetFileArgumentsSchema.parse(args);
                 const fileResponse = await apiClientInstance.v1.getFile(fileKey, fileQueryParams);
                 return responseToString(fileResponse.data);
-                
+
             case "figma_get_file_nodes":
                 const { fileKey: nodesFileKey, ...nodesQueryParams } = GetFileNodesArgumentsSchema.parse(args);
                 const nodesResponse = await apiClientInstance.v1.getFileNodes(nodesFileKey, nodesQueryParams);
                 return responseToString(nodesResponse.data);
-                
+
             case "figma_get_images":
                 const { fileKey: imagesFileKey, ...imagesQueryParams } = GetImagesArgumentsSchema.parse(args);
                 const imagesResponse = await apiClientInstance.v1.getImages(imagesFileKey, imagesQueryParams);
                 return responseToString(imagesResponse.data);
-                
+
             case "figma_get_image_fills":
                 const { fileKey: fillsFileKey } = FileKeySchema.parse(args);
                 const fillsResponse = await apiClientInstance.v1.getImageFills(fillsFileKey);
                 return responseToString(fillsResponse.data);
-                
+
             case "figma_get_file_versions":
                 const { fileKey: versionsFileKey, ...versionsQueryParams } = GetFileVersionsArgumentsSchema.parse(args);
                 const versionsResponse = await apiClientInstance.v1.getFileVersions(versionsFileKey, versionsQueryParams);
                 return responseToString(versionsResponse.data);
-                
+
             case "figma_get_comments":
                 const commentsParams = FigmaGetCommentsArgumentsSchema.parse(args);
                 const commentsResponse = await apiClientInstance.v1.getComments(commentsParams.fileKey, { as_md: commentsParams.as_md });
                 return responseToString(commentsResponse.data);
-                
+
             case "figma_post_comment":
                 const { fileKey: commentFileKey, message, comment_id, client_meta } = PostCommentArgumentsSchema.parse(args);
                 const postCommentResponse = await apiClientInstance.v1.postComment(commentFileKey, {
@@ -399,124 +402,124 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     client_meta
                 });
                 return responseToString(postCommentResponse.data);
-                
+
             case "figma_delete_comment":
                 const { fileKey: deleteCommentFileKey, commentId } = DeleteCommentArgumentsSchema.parse(args);
                 const deleteCommentResponse = await apiClientInstance.v1.deleteComment(deleteCommentFileKey, commentId);
                 return responseToString(deleteCommentResponse.data);
-                
+
             case "figma_get_comment_reactions":
                 const { fileKey: reactionsFileKey, commentId: reactionsCommentId, cursor } = GetCommentReactionsArgumentsSchema.parse(args);
                 const reactionsResponse = await apiClientInstance.v1.getCommentReactions(reactionsFileKey, reactionsCommentId, { cursor });
                 return responseToString(reactionsResponse.data);
-                
+
             case "figma_post_comment_reaction":
                 const { fileKey: postReactionFileKey, commentId: postReactionCommentId, emoji } = PostCommentReactionArgumentsSchema.parse(args);
                 const postReactionResponse = await apiClientInstance.v1.postCommentReaction(postReactionFileKey, postReactionCommentId, { emoji });
                 return responseToString(postReactionResponse.data);
-                
+
             case "figma_delete_comment_reaction":
                 const { fileKey: deleteReactionFileKey, commentId: deleteReactionCommentId, emoji: deleteEmoji } = DeleteCommentReactionArgumentsSchema.parse(args);
                 const deleteReactionResponse = await apiClientInstance.v1.deleteCommentReaction(deleteReactionFileKey, deleteReactionCommentId, { emoji: deleteEmoji });
                 return responseToString(deleteReactionResponse.data);
-                
+
             case "figma_get_team_projects":
                 const { teamId } = GetTeamProjectsArgumentsSchema.parse(args);
                 const teamProjectsResponse = await apiClientInstance.v1.getTeamProjects(teamId);
                 return responseToString(teamProjectsResponse.data);
-                
+
             case "figma_get_project_files":
                 const { projectId, branch_data } = GetProjectFilesArgumentsSchema.parse(args);
                 const projectFilesResponse = await apiClientInstance.v1.getProjectFiles(projectId, { branch_data });
                 return responseToString(projectFilesResponse.data);
-                
+
             case "figma_get_team_components":
                 const { teamId: componentsTeamId, ...componentsQueryParams } = GetTeamComponentsArgumentsSchema.parse(args);
                 const teamComponentsResponse = await apiClientInstance.v1.getTeamComponents(componentsTeamId, componentsQueryParams);
                 return responseToString(teamComponentsResponse.data);
-                
+
             case "figma_get_file_components":
                 const { fileKey: componentsFileKey } = FileKeySchema.parse(args);
                 const fileComponentsResponse = await apiClientInstance.v1.getFileComponents(componentsFileKey);
                 return responseToString(fileComponentsResponse.data);
-                
+
             case "figma_get_component":
                 const { key: componentKey } = GetComponentArgumentsSchema.parse(args);
                 const componentResponse = await apiClientInstance.v1.getComponent(componentKey);
                 return responseToString(componentResponse.data);
-                
+
             case "figma_get_team_component_sets":
                 const { teamId: componentSetsTeamId, ...componentSetsQueryParams } = GetTeamComponentSetsArgumentsSchema.parse(args);
                 const teamComponentSetsResponse = await apiClientInstance.v1.getTeamComponentSets(componentSetsTeamId, componentSetsQueryParams);
                 return responseToString(teamComponentSetsResponse.data);
-                
+
             case "figma_get_file_component_sets":
                 const { fileKey: componentSetsFileKey } = FileKeySchema.parse(args);
                 const fileComponentSetsResponse = await apiClientInstance.v1.getFileComponentSets(componentSetsFileKey);
                 return responseToString(fileComponentSetsResponse.data);
-                
+
             case "figma_get_component_set":
                 const { key: componentSetKey } = GetComponentSetArgumentsSchema.parse(args);
                 const componentSetResponse = await apiClientInstance.v1.getComponentSet(componentSetKey);
                 return responseToString(componentSetResponse.data);
-                
+
             case "figma_get_team_styles":
                 const { teamId: stylesTeamId, ...stylesQueryParams } = GetTeamStylesArgumentsSchema.parse(args);
                 const teamStylesResponse = await apiClientInstance.v1.getTeamStyles(stylesTeamId, stylesQueryParams);
                 return responseToString(teamStylesResponse.data);
-                
+
             case "figma_get_file_styles":
                 const { fileKey: stylesFileKey } = FileKeySchema.parse(args);
                 const fileStylesResponse = await apiClientInstance.v1.getFileStyles(stylesFileKey);
                 return responseToString(fileStylesResponse.data);
-                
+
             case "figma_get_style":
                 const { key: styleKey } = GetStyleArgumentsSchema.parse(args);
                 const styleResponse = await apiClientInstance.v1.getStyle(styleKey);
                 return responseToString(styleResponse.data);
-                
+
             // V2 API methods
             case "figma_post_webhook":
                 const webhookData = PostWebhookArgumentsSchema.parse(args);
                 const postWebhookResponse = await apiClientInstance.v2.postWebhook(webhookData as any);
                 return responseToString(postWebhookResponse.data);
-                
+
             case "figma_get_webhook":
                 const { webhook_id } = GetWebhookArgumentsSchema.parse(args);
                 const getWebhookResponse = await apiClientInstance.v2.getWebhook(webhook_id);
                 return responseToString(getWebhookResponse.data);
-                
-            case "figma_update_webhook": 
+
+            case "figma_update_webhook":
                 const { webhook_id: updateWebhookId, ...updateWebhookData } = UpdateWebhookArgumentsSchema.parse(args);
                 const updateWebhookResponse = await apiClientInstance.v2.putWebhook(updateWebhookId, updateWebhookData as any);
                 return responseToString(updateWebhookResponse.data);
-                
+
             case "figma_delete_webhook":
                 const { webhook_id: deleteWebhookId } = DeleteWebhookArgumentsSchema.parse(args);
                 const deleteWebhookResponse = await apiClientInstance.v2.deleteWebhook(deleteWebhookId);
                 return responseToString(deleteWebhookResponse.data);
-                
+
             case "figma_get_team_webhooks":
                 const { team_id } = GetTeamWebhooksArgumentsSchema.parse(args);
                 const getTeamWebhooksResponse = await apiClientInstance.v2.getTeamWebhooks(team_id);
                 return responseToString(getTeamWebhooksResponse.data);
-                
+
             // Library analytics methods
             case "figma_get_library_analytics_component_usages":
                 const { fileKey: componentsAnalyticsFileKey, ...componentsAnalyticsParams } = GetLibraryAnalyticsComponentUsagesArgumentsSchema.parse(args);
                 const getLibraryAnalyticsComponentsResponse = await apiClientInstance.v1.getLibraryAnalyticsComponentUsages(componentsAnalyticsFileKey, componentsAnalyticsParams);
                 return responseToString(getLibraryAnalyticsComponentsResponse.data);
-                
+
             case "figma_get_library_analytics_style_usages":
                 const { fileKey: stylesAnalyticsFileKey, ...stylesAnalyticsParams } = GetLibraryAnalyticsStyleUsagesArgumentsSchema.parse(args);
                 const getLibraryAnalyticsStylesResponse = await apiClientInstance.v1.getLibraryAnalyticsStyleUsages(stylesAnalyticsFileKey, stylesAnalyticsParams);
                 return responseToString(getLibraryAnalyticsStylesResponse.data);
-                
+
             case "figma_get_library_analytics_variable_usages":
                 const { fileKey: variablesAnalyticsFileKey, ...variablesAnalyticsParams } = GetLibraryAnalyticsVariableUsagesArgumentsSchema.parse(args);
                 const getLibraryAnalyticsVariablesResponse = await apiClientInstance.v1.getLibraryAnalyticsVariableUsages(variablesAnalyticsFileKey, variablesAnalyticsParams);
                 return responseToString(getLibraryAnalyticsVariablesResponse.data);
-                
+
             default:
                 throw new Error(`Unknown tool: ${name}`);
         }
@@ -536,6 +539,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 // Start the server
 async function main() {
     try {
+        // Parse command line arguments
+        const args = process.argv.slice(2);
+        let figmaToken;
+
+        // Look for --token or -t flag
+        for (let i = 0; i < args.length; i++) {
+            if ((args[i] === '--figma-token' || args[i] === '-t') && i + 1 < args.length) {
+                figmaToken = args[i + 1];
+                break;
+            }
+        }
+
+        // Check for token in environment variable if not provided in args
+        if (!figmaToken) {
+            figmaToken = process.env.FIGMA_API_KEY;
+        }
+
+        // Set the token if provided
+        if (figmaToken) {
+            setFigmaToken(figmaToken);
+        } else {
+            console.error("Warning: No Figma API token provided. Set FIGMA_API_KEY environment variable or use --figma-token flag.");
+        }
+
         console.error("Starting MCP Figma Server...");
         const transport = new StdioServerTransport();
         await server.connect(transport);
@@ -545,6 +572,16 @@ async function main() {
         process.exit(1);
     }
 }
+
+// Handle process events
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught exception:', error)
+})
+
+process.on('unhandledRejection', (error) => {
+    console.error('Unhandled rejection:', error)
+})
+
 
 main().catch((error) => {
     console.error("Fatal error in main():", error);

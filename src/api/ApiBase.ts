@@ -2,6 +2,8 @@ import { Api } from "./Api.js";
 import { AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 
+
+let figmaToken = process.env.FIGMA_TOKEN ?? "";
 const requestConfig: AxiosRequestConfig = {
     baseURL: process.env.API_URL ?? "https://api.figma.com",
     headers: {
@@ -23,8 +25,12 @@ axiosRetry(apiClientInstance.instance, {
 });
 
 apiClientInstance.instance.interceptors.request.use((request) => {
-    request.headers['X-Figma-Token'] = process.env.FIGMA_TOKEN ?? "";
+    request.headers['X-Figma-Token'] = figmaToken;
     return request;
 });
+
+export function setFigmaToken(token: string) {
+    figmaToken = token;
+}
 
 export default apiClientInstance;

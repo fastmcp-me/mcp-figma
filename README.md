@@ -2,6 +2,7 @@
 
 MCP Server for interacting with the Figma API. This server provides a complete set of Figma API methods through the Model Context Protocol.
 
+![Figma MCP Server](https://github.com/user-attachments/assets/figma-mcp-demo.png)
 
 ## Tools
 
@@ -76,11 +77,26 @@ npm run build
 
 ## Setup
 
-To use this MCP server, you need to set up your Figma API token.
+To use this MCP server, you need to set up your Figma API token. You can do this in one of three ways:
+
+### 1. Environment Variable
+
+Create a `.env` file in the project root or set the environment variable directly:
 
 ```
-# Create a .env file
 FIGMA_API_KEY=your_figma_api_key
+```
+
+### 2. Command Line Arguments
+
+When starting the server, you can pass your Figma API token as a command-line argument:
+
+```bash
+# Using the long form
+node dist/index.js --figma-token YOUR_FIGMA_TOKEN
+
+# Or using the short form
+node dist/index.js -ft YOUR_FIGMA_TOKEN
 ```
 
 ### Usage with Claude Desktop
@@ -93,19 +109,34 @@ Add the following to your `claude_desktop_config.json`:
   "mcpServers": {
     "figma": {
       "command": "npx",
-      "args": ["@jayarrowz/mcp-figma"]
+      "args": ["@jayarrowz/mcp-figma", "--figma-token", "your_figma_api_key"]
     }
   }
 }
 ```
 
-#### Direct Node.js
+#### Direct Node.js (with environment variable)
 ```json
 {
   "mcpServers": {
     "figma": {
       "command": "node",
-      "args": ["/path/to/mcp-figma/dist/index.js"]
+      "args": ["/path/to/mcp-figma/dist/index.js"],  
+      "env": {
+        "FIGMA_API_KEY": "your_figma_api_key"
+      }
+    }
+  }
+}
+```
+
+#### Direct Node.js (with command-line argument)
+```json
+{
+  "mcpServers": {
+    "figma": {
+      "command": "node",
+      "args": ["/path/to/mcp-figma/dist/index.js", "--figma-token", "your_figma_api_key"]
     }
   }
 }
@@ -158,6 +189,9 @@ npm start
 
 # Build the server
 npm run build
+
+# Run with a Figma API token
+npm start -- --figma-token YOUR_FIGMA_TOKEN
 ```
 
 ## License
