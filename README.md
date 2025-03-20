@@ -2,8 +2,6 @@
 
 MCP Server for interacting with the Figma API. This server provides a complete set of Figma API methods through the Model Context Protocol. Sometimes on large figma files you might have to tell it to use depth = 1 for figma_get_file then increase when it needs more.
 
-![Figma MCP Server](https://github.com/user-attachments/assets/figma-mcp-demo.png)
-
 ## Tools
 
 This server implements all Figma API methods as MCP tools:
