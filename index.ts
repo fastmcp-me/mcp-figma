@@ -203,12 +203,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 name: "figma_get_me",
                 description: "Get the current user",
                 inputSchema: {
-                    properties: {
-                        aString: {
-                            type: "string",
-                            description: "A string"
-                        }
-                    },
+                    properties: {},
                     required: [],
                     type: "object",
                 }
