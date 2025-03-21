@@ -1,6 +1,6 @@
 # Figma MCP Server
 
-[![smithery badge](https://smithery.ai/badge/@jayarrowz/mcp-figma)](https://smithery.ai/embed/@jayarrowz/mcp-figma)
+[![smithery badge](https://smithery.ai/badge/@JayArrowz/mcp-figma)](https://smithery.ai/server/@JayArrowz/mcp-figma)
 
 MCP Server for interacting with the Figma API. This server provides a complete set of Figma API methods through the Model Context Protocol. Sometimes on large figma files you might have to tell it to use depth = 1 for figma_get_file then increase when it needs more.
 
