@@ -1,11 +1,11 @@
 {
-  "name": "@jayarrowz/mcp-figma",
-  "version": "0.6.9",
+  "name": "@thirdstrandstudio/mcp-figma",
+  "version": "0.7.0",
   "description": "MCP server for figma",
   "license": "MIT",
-  "author": "JayArrowz (https://github.com/JayArrowz)",
-  "homepage": "https://github.com/JayArrowz/mcp-figma",
-  "bugs": "https://github.com/JayArrowz/mcp-figma/issues",
+  "author": "Third Strand Studio LLC (https://github.com/thirdstrandstudio)",
+  "homepage": "https://github.com/thirdstrandstudio/mcp-figma",
+  "bugs": "https://github.com/thirdstrandstudio/mcp-figma/issues",
   "type": "module",
   "bin": {
     "mcp-figma": "dist/index.js"
