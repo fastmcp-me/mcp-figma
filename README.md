@@ -3,7 +3,7 @@
 [![Third Strand Studio](https://img.shields.io/badge/Third%20Strand%20Studio-Visit%20Us-blue)](https://thirdstrandstudio.com)
 
 
-[![smithery badge](https://smithery.ai/badge/@JayArrowz/mcp-figma)](https://smithery.ai/server/@JayArrowz/mcp-figma)
+[![smithery badge](https://smithery.ai/badge/@thirdstrandstudio/mcp-figma)](https://smithery.ai/server/@thirdstrandstudio/mcp-figma)
 
 MCP Server for interacting with the Figma API. This server provides a complete set of Figma API methods through the Model Context Protocol. Sometimes on large figma files you might have to tell it to use depth = 1 for figma_get_file then increase when it needs more.
 
@@ -65,7 +65,7 @@ This server implements all Figma API methods as MCP tools:
 
 ### Installing via Smithery
 
-To install mcp-figma for Claude Desktop automatically via [Smithery](https://smithery.ai/embed/@jayarrowz/mcp-figma):
+To install mcp-figma for Claude Desktop automatically via [Smithery](https://smithery.ai/embed/@thirdstrandstudio/mcp-figma):
 
 ```bash
 npx @smithery/cli@latest install @thirdstrandstudio/mcp-figma --client claude
