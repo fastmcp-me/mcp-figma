@@ -1,6 +1,6 @@
 # Figma MCP Server
 
-[![Third Strand Studio](https://img.shields.io/badge/Third%20Strand%20Studio-Visit%20Us-blue)](https://thirdstrandstudio.com)
+[![Third Strand Studio](https://img.shields.io/badge/Third%20Strand%20Studio-Visit%20Us-blue)](https://tss.topiray.com)
 
 
 [![smithery badge](https://smithery.ai/badge/@thirdstrandstudio/mcp-figma)](https://smithery.ai/server/@thirdstrandstudio/mcp-figma)
